@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solar System Quiz</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #071126;
+      --panel: #101d3a;
+      --panel-2: #172a50;
+      --accent: #ffd34d;
+      --cyan: #60e6ff;
+      --coral: #ff7a7a;
+      --good: #4fe38c;
+      --bad: #ff6b6b;
+      --text: #f7fbff;
+      --muted: #b9c8e6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 15% 12%, rgba(96, 230, 255, 0.16), transparent 28%),
+        radial-gradient(circle at 85% 16%, rgba(255, 211, 77, 0.14), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(255, 122, 122, 0.12), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      padding: 22px;
+    }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      width: min(980px, 100%);
+      margin: 0 auto 18px;
+      padding: 10px;
+      border: 1px solid rgba(96, 230, 255, 0.28);
+      border-radius: 8px;
+      background: rgba(7, 17, 38, 0.88);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .nav-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      background: linear-gradient(180deg, rgba(96, 230, 255, 0.18), rgba(23, 42, 80, 0.96));
+      color: var(--text);
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .nav-button.primary {
+      color: #081225;
+      border-color: rgba(255, 211, 77, 0.7);
+      background: var(--accent);
+    }
+
+    main {
+      width: min(980px, 100%);
+      margin: 0 auto;
+    }
+
+    header {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .quiz {
+      display: grid;
+      gap: 14px;
+    }
+
+    .question {
+      border: 2px solid rgba(96, 230, 255, 0.28);
+      background: linear-gradient(180deg, rgba(23, 42, 80, 0.96), rgba(16, 29, 58, 0.96));
+      border-radius: 8px;
+      padding: 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+    }
+
+    .question h2 {
+      margin: 0 0 12px;
+      font-size: 19px;
+      line-height: 1.3;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    label {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+    }
+
+    input {
+      margin-top: 2px;
+      accent-color: var(--cyan);
+    }
+
+    .feedback {
+      min-height: 24px;
+      margin: 12px 0 0;
+      font-weight: 700;
+    }
+
+    .feedback.good { color: var(--good); }
+    .feedback.bad { color: var(--bad); }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      padding: 12px 18px;
+      font-weight: 800;
+      color: #081225;
+      background: var(--accent);
+      cursor: pointer;
+      min-width: 142px;
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .score {
+      margin: 16px auto 0;
+      width: fit-content;
+      max-width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: rgba(96, 230, 255, 0.12);
+      border: 1px solid rgba(96, 230, 255, 0.32);
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .planet-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .planet {
+      width: 18px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--c);
+      box-shadow: 0 0 16px color-mix(in srgb, var(--c), transparent 30%);
+    }
+
+    .menu-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(2, 7, 18, 0.72);
+    }
+
+    .menu-modal.open {
+      display: grid;
+    }
+
+    .menu-panel {
+      width: min(620px, 100%);
+      border: 2px solid rgba(96, 230, 255, 0.42);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #132752, #08152f);
+      padding: 20px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
+    }
+
+    .menu-panel h2 {
+      margin: 0 0 12px;
+      color: var(--accent);
+      font-size: 28px;
+      text-transform: uppercase;
+    }
+
+    .menu-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .menu-item {
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 7px;
+      padding: 12px;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.07);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .close-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+
+      .top-nav {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="top-nav" aria-label="Lesson navigation">
+    <a class="nav-button primary" href="https://mitoworld.io/world/w/6588/solar-system">Home</a>
+    <button class="nav-button" id="previous" type="button">Previous</button>
+    <button class="nav-button" id="topicMenu" type="button">Topic Menu</button>
+    <button class="nav-button" id="next" type="button">Next</button>
+  </nav>
+
+  <main>
+    <header>
+      <h1>Solar System Quiz</h1>
+      <p class="subtitle">Choose one answer for each question, then check your score.</p>
+      <div class="planet-row" aria-hidden="true">
+        <span class="planet" style="--c:#ffd34d"></span>
+        <span class="planet" style="--c:#b9b1a8"></span>
+        <span class="planet" style="--c:#ff9f5f"></span>
+        <span class="planet" style="--c:#54a8ff"></span>
+        <span class="planet" style="--c:#ff6b6b"></span>
+        <span class="planet" style="--c:#d8b27a"></span>
+        <span class="planet" style="--c:#8ad6ff"></span>
+      </div>
+    </header>
+
+    <section class="quiz" id="quiz"></section>
+
+    <div class="actions">
+      <button id="check">Check Answers</button>
+      <button class="secondary" id="reset">Try Again</button>
+    </div>
+    <div class="score" id="score" aria-live="polite">Score: 0 / 5</div>
+  </main>
+
+  <section class="menu-modal" id="menuModal" aria-hidden="true">
+    <div class="menu-panel" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+      <h2 id="menuTitle">Topic Menu</h2>
+      <div class="menu-grid">
+        <a class="menu-item" href="https://mitoworld.io/world/w/6588/solar-system">Home: Solar System World</a>
+        <a class="menu-item" href="learning-objectives-board.png">Learning Objectives</a>
+        <button class="menu-item" type="button" data-jump="0">Question 1: The Sun</button>
+        <button class="menu-item" type="button" data-jump="1">Question 2: Mars</button>
+        <button class="menu-item" type="button" data-jump="2">Question 3: Jupiter</button>
+        <button class="menu-item" type="button" data-jump="3">Question 4: Orbits</button>
+        <button class="menu-item" type="button" data-jump="4">Question 5: Earth and Life</button>
+        <a class="menu-item" href="https://www.solarsystemscope.com/">External Resource: Solar System Scope</a>
+      </div>
+      <div class="close-row">
+        <button class="secondary" id="closeMenu" type="button">Close Menu</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const questions = [
+      {
+        text: "Which object is at the center of our Solar System?",
+        options: ["Earth", "The Sun", "The Moon", "Jupiter"],
+        answer: 1,
+        feedback: "Correct: The Sun is the star at the center of our Solar System."
+      },
+      {
+        text: "Which planet is known as the Red Planet?",
+        options: ["Mars", "Venus", "Mercury", "Neptune"],
+        answer: 0,
+        feedback: "Correct: Mars looks red because of iron oxide, or rust, on its surface."
+      },
+      {
+        text: "Which planet is the largest planet in the Solar System?",
+        options: ["Earth", "Saturn", "Jupiter", "Uranus"],
+        answer: 2,
+        feedback: "Correct: Jupiter is the largest planet in our Solar System."
+      },
+      {
+        text: "What do planets do as they move around the Sun?",
+        options: ["They orbit the Sun", "They stop moving at night", "They orbit Earth's Moon", "They turn into stars"],
+        answer: 0,
+        feedback: "Correct: Planets travel around the Sun in paths called orbits."
+      },
+      {
+        text: "Why is Earth able to support life?",
+        options: ["It has liquid water, air, and suitable temperatures", "It is the biggest planet", "It is closest to the Sun", "It has no gravity"],
+        answer: 0,
+        feedback: "Correct: Earth has liquid water, an atmosphere, and temperatures suitable for life."
+      }
+    ];
+
+    const quiz = document.querySelector("#quiz");
+    const score = document.querySelector("#score");
+    let currentQuestion = 0;
+
+    function renderQuiz() {
+      quiz.innerHTML = questions.map((question, index) => `
+        <article class="question">
+          <h2>${index + 1}. ${question.text}</h2>
+          <div class="options">
+            ${question.options.map((option, optionIndex) => `
+              <label>
+                <input type="radio" name="q${index}" value="${optionIndex}">
+                <span>${option}</span>
+              </label>
+            `).join("")}
+          </div>
+          <p class="feedback" id="f${index}" aria-live="polite"></p>
+        </article>
+      `).join("");
+      score.textContent = "Score: 0 / 5";
+    }
+
+    function jumpToQuestion(index) {
+      const cards = [...document.querySelectorAll(".question")];
+      currentQuestion = Math.max(0, Math.min(index, cards.length - 1));
+      cards[currentQuestion]?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function toggleMenu(open) {
+      const menu = document.querySelector("#menuModal");
+      menu.classList.toggle("open", open);
+      menu.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+
+    function checkAnswers() {
+      let total = 0;
+      questions.forEach((question, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        const feedback = document.querySelector(`#f${index}`);
+        if (!selected) {
+          feedback.className = "feedback bad";
+          feedback.textContent = "Please choose an answer.";
+          return;
+        }
+        if (Number(selected.value) === question.answer) {
+          total += 1;
+          feedback.className = "feedback good";
+          feedback.textContent = question.feedback;
+        } else {
+          feedback.className = "feedback bad";
+          feedback.textContent = `Incorrect: The correct answer is "${question.options[question.answer]}".`;
+        }
+      });
+      score.textContent = `Score: ${total} / ${questions.length}`;
+    }
+
+    document.querySelector("#check").addEventListener("click", checkAnswers);
+    document.querySelector("#reset").addEventListener("click", renderQuiz);
+    document.querySelector("#previous").addEventListener("click", () => jumpToQuestion(currentQuestion - 1));
+    document.querySelector("#next").addEventListener("click", () => jumpToQuestion(currentQuestion + 1));
+    document.querySelector("#topicMenu").addEventListener("click", () => toggleMenu(true));
+    document.querySelector("#closeMenu").addEventListener("click", () => toggleMenu(false));
+    document.querySelector("#menuModal").addEventListener("click", (event) => {
+      if (event.target.id === "menuModal") toggleMenu(false);
+    });
+    document.querySelectorAll("[data-jump]").forEach((button) => {
+      button.addEventListener("click", () => {
+        toggleMenu(false);
+        jumpToQuestion(Number(button.dataset.jump));
+      });
+    });
+    renderQuiz();
+  </script>
+</body>
+</html>
